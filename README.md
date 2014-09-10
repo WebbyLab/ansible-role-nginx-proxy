@@ -6,7 +6,10 @@ Ansible role for nginx-proxy (Ubuntu server).
 Role Variables
 --------------
 
-    nginx_proxy_default_conf: files/default.conf
+    nginx_proxy_listen_port: 80
+    nginx_proxy_hostname: web-app
+    nginx_proxy_locations:
+      '/' : ['expires max', 'root /home/web-app/web-app/public']
 
 Example Playbook
 ----------------
