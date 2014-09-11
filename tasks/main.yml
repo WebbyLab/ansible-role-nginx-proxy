@@ -1,0 +1,12 @@
+---
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Install GoAccess (log analyzer)
+  apt: name=goaccess state=present
+
+- name: Copy nginx configuration
+  template: src=default.conf dest=/etc/nginx/sites-enabled/proxy
+
+- name: Start nginx
+  service: name=nginx state=restarted
