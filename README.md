@@ -17,7 +17,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - role: webbylab.nginx-proxy
+         - role: WebbyLab.nginx-proxy
            nginx_proxy_listen_port: 80
            nginx_proxy_hostname: web-app
            nginx_proxy_static_locations: 
