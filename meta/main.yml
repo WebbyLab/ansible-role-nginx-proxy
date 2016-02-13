@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  author: webbylab
+  author: WebbyLab
   description: Ansible role for nginx setup as reverse proxy on Ubuntu server
   company: WebbyLab
   license: MIT
