@@ -5,6 +5,7 @@ galaxy_info:
   company: WebbyLab
   license: MIT
   min_ansible_version: 1.5
+  dependencies: []
   platforms:
   - name: Ubuntu
     versions:
