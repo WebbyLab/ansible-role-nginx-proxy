@@ -28,7 +28,7 @@ Example Playbook
            nginx_proxy_ssl_certificate_key: files/server.key
            nginx_proxy_static_locations:
              - {location: '/static', root: '/home/web-app/web-app/public', try_files: '/index.html'}
-             - {location: '/assets', alias: '/home/web-app/web-app/assets'}
+             - {location: '/assets', alias: '/home/web-app/web-app/assets', expires: 600}
            nginx_proxy_pass_locations: [{location: '/api', proxy_pass: 'http://127.0.0.1:8080'}]
 
 
