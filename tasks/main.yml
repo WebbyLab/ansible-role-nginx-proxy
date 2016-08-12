@@ -14,12 +14,12 @@
 - name: Copy SSL certificate to "/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.cert"
   copy: 'src={{nginx_proxy_ssl_certificate}} dest="/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.cert" mode=0600'
   notify: reload nginx
-  when: nginx_proxy_ssl_certificate is defined and nginx_proxy_ssl_certificate.stat.exists
+  when: nginx_proxy_ssl_certificate is defined
 
 - name: Copy SSL certificate key to "/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.key"
   copy: 'src={{nginx_proxy_ssl_certificate_key}} dest="/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.key" mode=0600'
   notify: reload nginx
-  when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists
+  when: nginx_proxy_ssl_certificate_key is defined
 
 - name: Copy nginx configuration for "{{nginx_proxy_configuration_name}}"
   template: src=default.conf dest="/etc/nginx/sites-enabled/{{nginx_proxy_configuration_name}}"
