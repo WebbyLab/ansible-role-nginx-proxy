@@ -8,4 +8,3 @@ nginx_proxy_pass_locations: [{location: '/api', proxy_pass: 'http://127.0.0.1:80
 
 nginx_proxy_ssl_certificate: ''
 nginx_proxy_ssl_certificate_key: ''
-nginx_proxy_htpasswd: ''

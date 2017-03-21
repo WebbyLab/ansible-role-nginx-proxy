@@ -2,11 +2,12 @@
 - name: Add nginx stable repo
   apt_repository: repo=ppa:nginx/stable state=present update_cache=yes
 
-- name: Install nginx
-  apt: name=nginx-full state=present
-
-- name: Install GoAccess (log analyzer)
-  apt: name=goaccess state=present
+- name: Install deps (apt)
+  apt: name={{item}} state=present update-cache=yes cache_valid_time=864000
+  with_items:
+    - nginx-full
+    - goaccess
+    - python-passlib
 
 - name: Create "/etc/nginx/ssl" dir
   file: 'path="/etc/nginx/ssl" mode=0700 state=directory'
@@ -21,14 +22,14 @@
   notify: reload nginx
   when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists
 
-- name: Copy htpasswd key to "/etc/nginx/passwdfile"
-  copy: 'src={{nginx_proxy_htpasswd}} dest="/etc/nginx/passwdfile" mode=0600'
-  notify: reload nginx
-  when: nginx_proxy_htpasswd is defined and nginx_proxy_htpasswd.stat.exists
-
 - name: Copy nginx configuration for "{{nginx_proxy_configuration_name}}"
   template: src=default.conf dest="/etc/nginx/sites-enabled/{{nginx_proxy_configuration_name}}"
   notify: reload nginx
 
 - name: Ensure nginx started
   service: name=nginx state=started enabled=yes
+
+- name: Add a user to a password file and ensure permissions are set
+  htpasswd: 'path=/etc/nginx/passwdfile name={{nginx_proxy_user_name}} password={{nginx_proxy_htpasswd}} owner=root group=www-data mode=0640'
+  when: nginx_proxy_htpasswd is defined and nginx_proxy_user_name is defined
+  notify: reload nginx
