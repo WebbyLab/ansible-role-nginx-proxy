@@ -21,6 +21,11 @@
   notify: reload nginx
   when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists
 
+- name: Copy htpasswd key to "/etc/nginx/passwdfile"
+  copy: 'src={{nginx_proxy_htpasswd}} dest="/etc/nginx/passwdfile" mode=0600'
+  notify: reload nginx
+  when: nginx_proxy_htpasswd is defined and nginx_proxy_htpasswd.stat.exists
+
 - name: Copy nginx configuration for "{{nginx_proxy_configuration_name}}"
   template: src=default.conf dest="/etc/nginx/sites-enabled/{{nginx_proxy_configuration_name}}"
   notify: reload nginx
