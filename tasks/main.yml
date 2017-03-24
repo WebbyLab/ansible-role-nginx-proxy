@@ -2,12 +2,14 @@
 - name: Add nginx stable repo
   apt_repository: repo=ppa:nginx/stable state=present update_cache=yes
 
-- name: Install deps (apt)
-  apt: name={{item}} state=present update-cache=yes cache_valid_time=864000
-  with_items:
-    - nginx-full
-    - goaccess
-    - python-passlib
+- name: Install nginx
+  apt: name=nginx-full state=present
+
+- name: Install GoAccess (log analyzer)
+  apt: name=goaccess state=present
+
+- name: Install python-passlib
+  apt: name=python-passlib state=present
 
 - name: Create "/etc/nginx/ssl" dir
   file: 'path="/etc/nginx/ssl" mode=0700 state=directory'
@@ -20,11 +22,12 @@
 - name: Copy SSL certificate key to "/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.key"
   copy: 'src={{nginx_proxy_ssl_certificate_key}} dest="/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.key" mode=0600'
   notify: reload nginx
-  when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists
+  when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists and certbot_update == 'false'
 
 - name: Copy nginx configuration for "{{nginx_proxy_configuration_name}}"
   template: src=default.conf dest="/etc/nginx/sites-enabled/{{nginx_proxy_configuration_name}}"
   notify: reload nginx
+  when: nginx_proxy_ssl_certificate_key is defined or certbot_update == 'true'
 
 - name: Ensure nginx started
   service: name=nginx state=started enabled=yes
@@ -32,4 +35,16 @@
 - name: Add a user to a password file and ensure permissions are set
   htpasswd: 'path=/etc/nginx/passwdfile name={{nginx_proxy_user_name}} password={{nginx_proxy_htpasswd}} owner=root group=www-data mode=0640'
   when: nginx_proxy_htpasswd is defined and nginx_proxy_user_name is defined
+  notify: reload nginx
+
+- name: Create "{{certbot_dir}}" dir
+  file: path="{{certbot_dir}}" mode=0755 state=directory
+
+- name: Download certbot-auto
+  get_url: url='https://dl.eff.org/certbot-auto' dest={{certbot_dir}} mode=0755
+  when: certbot_update == 'true'
+
+- name: Add cron job for 'certbot-auto renew'
+  cron: special_time=daily name='Update ssl certs' job='{{certbot_dir}}/certbot-auto --nginx --email cbetjiomyp@gmail.com renew >> /var/log/certbot-renew.log'
+  when: certbot_update == 'true'
   notify: reload nginx
