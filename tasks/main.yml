@@ -39,6 +39,7 @@
 
 - name: Create "{{certbot_dir}}" dir
   file: path="{{certbot_dir}}" mode=0755 state=directory
+  when: certbot_update == 'true'
 
 - name: Download certbot-auto
   get_url: url='https://dl.eff.org/certbot-auto' dest={{certbot_dir}} mode=0755
