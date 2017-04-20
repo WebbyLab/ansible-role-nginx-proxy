@@ -32,11 +32,6 @@
 - name: Ensure nginx started
   service: name=nginx state=started enabled=yes
 
-# - name: Add a user to a password file and ensure permissions are set
-#   htpasswd: 'path=/etc/nginx/passwdfile name={{nginx_proxy_user_name}} password={{nginx_proxy_htpasswd}} owner=root group=www-data mode=0640'
-#   when: nginx_proxy_htpasswd is defined and nginx_proxy_user_name is defined
-#   notify: reload nginx
-
 - name: Create "/etc/nginx/auth-basic" dir
   file: 'path="/etc/nginx/auth-basic" mode=0640 state=directory'
   notify: reload nginx
