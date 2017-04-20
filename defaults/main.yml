@@ -9,5 +9,8 @@ nginx_proxy_pass_locations: [{location: '/api', proxy_pass: 'http://127.0.0.1:80
 nginx_proxy_ssl_certificate: ''
 nginx_proxy_ssl_certificate_key: ''
 
-certbot_dir: '/etc/certbot'
-certbot_update: 'false'
+nginx_proxy_auth_user_files_dir: 'false'
+
+nginx_proxy_certbot_dir: '/etc/certbot'
+nginx_proxy_certbot_enabled: 'false'
+nginx_proxy_certbot_email: 'user@mail.com'

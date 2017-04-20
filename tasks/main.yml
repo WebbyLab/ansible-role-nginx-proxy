@@ -17,35 +17,45 @@
 - name: Copy SSL certificate to "/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.cert"
   copy: 'src={{nginx_proxy_ssl_certificate}} dest="/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.cert" mode=0600'
   notify: reload nginx
-  when: nginx_proxy_ssl_certificate is defined and nginx_proxy_ssl_certificate.stat.exists
+  when: nginx_proxy_ssl_certificate is defined and nginx_proxy_ssl_certificate.stat.exists and nginx_proxy_certbot_enabled == 'false'
 
 - name: Copy SSL certificate key to "/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.key"
   copy: 'src={{nginx_proxy_ssl_certificate_key}} dest="/etc/nginx/ssl/{{nginx_proxy_configuration_name}}.key" mode=0600'
   notify: reload nginx
-  when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists and certbot_update == 'false'
+  when: nginx_proxy_ssl_certificate_key is defined and nginx_proxy_ssl_certificate_key.stat.exists and nginx_proxy_certbot_enabled == 'false'
 
 - name: Copy nginx configuration for "{{nginx_proxy_configuration_name}}"
   template: src=default.conf dest="/etc/nginx/sites-enabled/{{nginx_proxy_configuration_name}}"
   notify: reload nginx
-  when: nginx_proxy_ssl_certificate_key is defined or certbot_update == 'true'
+  when: nginx_proxy_ssl_certificate_key is defined or nginx_proxy_certbot_enabled == 'true'
 
 - name: Ensure nginx started
   service: name=nginx state=started enabled=yes
 
-- name: Add a user to a password file and ensure permissions are set
-  htpasswd: 'path=/etc/nginx/passwdfile name={{nginx_proxy_user_name}} password={{nginx_proxy_htpasswd}} owner=root group=www-data mode=0640'
-  when: nginx_proxy_htpasswd is defined and nginx_proxy_user_name is defined
-  notify: reload nginx
+# - name: Add a user to a password file and ensure permissions are set
+#   htpasswd: 'path=/etc/nginx/passwdfile name={{nginx_proxy_user_name}} password={{nginx_proxy_htpasswd}} owner=root group=www-data mode=0640'
+#   when: nginx_proxy_htpasswd is defined and nginx_proxy_user_name is defined
+#   notify: reload nginx
 
-- name: Create "{{certbot_dir}}" dir
-  file: path="{{certbot_dir}}" mode=0755 state=directory
-  when: certbot_update == 'true'
+- name: Create "/etc/nginx/auth-basic" dir
+  file: 'path="/etc/nginx/auth-basic" mode=0640 state=directory'
+  notify: reload nginx
+  when: nginx_proxy_auth_basic_user_files_dir != 'false'
+
+- name: Copy nginx_proxy_auth_basic_user_files to "/etc/nginx/auth-basic/"
+  copy: 'src={{nginx_proxy_auth_basic_user_files_dir}}/ dest="/etc/nginx/auth-basic/" mode=0640'
+  notify: reload nginx
+  when: nginx_proxy_auth_basic_user_files_dir != 'false'
+
+- name: Create "{{nginx_proxy_certbot_dir}}" dir
+  file: path="{{nginx_proxy_certbot_dir}}" mode=0755 state=directory
+  when: nginx_proxy_certbot_enabled == 'true'
 
 - name: Download certbot-auto
-  get_url: url='https://dl.eff.org/certbot-auto' dest={{certbot_dir}} mode=0755
-  when: certbot_update == 'true'
+  get_url: url='https://dl.eff.org/certbot-auto' dest={{nginx_proxy_certbot_dir}} mode=0755
+  when: nginx_proxy_certbot_enabled == 'true'
 
 - name: Add cron job for 'certbot-auto renew'
-  cron: special_time=daily name='Update ssl certs' job='{{certbot_dir}}/certbot-auto --nginx --email cbetjiomyp@gmail.com renew >> /var/log/certbot-renew.log'
-  when: certbot_update == 'true'
+  cron: special_time=daily name='Update ssl certs' job='{{nginx_proxy_certbot_dir}}/certbot-auto --nginx --email nginx_proxy_certbot_email renew >> /var/log/certbot-renew.log'
+  when: nginx_proxy_certbot_enabled == 'true'
   notify: reload nginx
