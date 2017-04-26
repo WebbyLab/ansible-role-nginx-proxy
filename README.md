@@ -12,7 +12,7 @@ Role Variables
     nginx_proxy_ssl_certificate_key: ''
     nginx_proxy_static_locations: [{location: '/static', root: '/home/web-app/web-app/public', try_files: '/index.html'}]
     nginx_proxy_pass_locations: [{location: '/api', proxy_pass: 'http://127.0.0.1:8080'}]
-    nginx_proxy_certbot_dir: '/etc/certbot'
+    nginx_proxy_certbot_dir: '~/certbot'
     nginx_proxy_certbot_enabled: 'false'
     nginx_proxy_certbot_email: 'user@mail.com'
     nginx_proxy_auth_user_files_dir: 'false'

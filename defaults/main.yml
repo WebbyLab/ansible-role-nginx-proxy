@@ -11,6 +11,6 @@ nginx_proxy_ssl_certificate_key: ''
 
 nginx_proxy_auth_user_files_dir: 'false'
 
-nginx_proxy_certbot_dir: '/etc/certbot'
+nginx_proxy_certbot_dir: '~/certbot'
 nginx_proxy_certbot_enabled: 'false'
 nginx_proxy_certbot_email: 'user@mail.com'
