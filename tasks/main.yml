@@ -48,6 +48,6 @@
   when: nginx_proxy_certbot_enabled == 'true'
 
 - name: Add cron job for 'certbot-auto renew'
-  cron: special_time=daily name='Update ssl certs' job='{{nginx_proxy_certbot_dir}}/certbot-auto --nginx --email nginx_proxy_certbot_email renew >> /var/log/certbot-renew.log'
+  cron: special_time=daily name='Update ssl certs' job='{{nginx_proxy_certbot_dir}}/certbot-auto --nginx --email {{nginx_proxy_certbot_email}} renew >> /var/log/certbot-renew.log'
   when: nginx_proxy_certbot_enabled == 'true'
   notify: reload nginx
